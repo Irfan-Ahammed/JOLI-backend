@@ -1,13 +1,16 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import getDatauri from "../utils/datauri.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const register = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, password } = req.body;
+
     if (!fullname || !email || !phoneNumber || !password) {
       return res.status(400).json({
-        message: "Something is missing",
+        message: "All fields are required",
         success: false,
       });
     }
@@ -102,7 +105,12 @@ export const logout = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { fullname, email, phoneNumber, bio, location } = req.body;
+    const { fullname, email, phoneNumber, bio, location, dpImage } = req.body;
+    console.log(req.body);
+
+    const file = req.file;
+    const fileUri = getDatauri(file);
+    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
 
     const userId = req.id; //middleware authentication
     let user = await User.findById(userId);
@@ -119,7 +127,8 @@ export const updateProfile = async (req, res) => {
     if (phoneNumber) user.phoneNumber = phoneNumber;
     if (bio) user.profile.bio = bio;
     if (location) user.profile.location = location;
-
+    if (dpImage) user.dpImage = dpImage;
+    if (cloudResponse) user.dpImage = cloudResponse.secure_url;
     await user.save();
 
     user = {
@@ -128,6 +137,7 @@ export const updateProfile = async (req, res) => {
       email: user.email,
       phoneNumber: user.phoneNumber,
       profile: user.profile,
+      dpImage: user.dpImage,
     };
     return res.status(200).json({
       message: "Profile updated successfully.",
