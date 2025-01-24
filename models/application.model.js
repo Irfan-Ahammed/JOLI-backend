@@ -14,15 +14,11 @@ const applicationSchema = new mongoose.Schema({
   message: {
     type: String, // Optional message from the applicant to the employer
     trim: true,
-
-
-
-    
   },
     status: {
     type: String,
-    enum: ["pending", "accepted", "rejected"], // Allowed values
-    default: "pending",
+    enum: ["Pending", "Accepted", "Rejected"], // Allowed values
+    default: "Pending",
   },
 
   appliedAt: {

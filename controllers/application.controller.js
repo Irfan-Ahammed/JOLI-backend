@@ -6,7 +6,7 @@ export const applyJob = async (req, res) => {
   try {
     const userId = req.id;
     const jobId = req.params.id;
-    console.log("User ID:", userId); // Log userId to check if it's populated
+    console.log("User ID:", userId);
     if (!jobId) {
       return res.status(400).json({
         message: "Job id is required.",
@@ -58,7 +58,7 @@ export const applyJob = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "You have successfully applied for the job.",
+      message: "job applied successfully",
       application: newApplication,
     });
   } catch (error) {

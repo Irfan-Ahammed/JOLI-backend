@@ -1,47 +1,62 @@
 import Job from "../models/job.model.js";
+import User from "../models/user.model.js";
 
 // Create a new job
 export const createJob = async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      location,
-      jobType,
-      wage,
-      requirements,
-      isActive,
-    } = req.body;
-
+    const { title, description, requirements, wage, location, jobType } =
+      req.body;
     const userId = req.id;
 
     // Validate required fields
-    if (!title || !description || !location || !wage || !userId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing required fields" });
+    if (
+      !title ||
+      !description ||
+      !requirements ||
+      !wage ||
+      !location ||
+      !jobType ||
+      !userId
+    ) {
+      return res.status(400).json({
+        message: "Something is missing. Please provide all required fields.",
+        success: false,
+      });
     }
 
-    const newJob = await Job.create({
+    // Fetch user details (including fullname) from the User model
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+      });
+    }
+
+    // Create a new job with the user's fullname included
+    const job = await Job.create({
       title,
       description,
+      requirements: requirements.split(","),
+      wage: Number(wage),
       location,
       jobType,
-      wage: Number(wage),
       postedBy: userId,
-      requirements,
-      isActive,
+      userFullname: user.fullname,
     });
 
+    // Send success response
     return res.status(201).json({
+      message: "New job created successfully.",
+      job,
       success: true,
-      message: "Job created successfully",
-      job: newJob,
     });
   } catch (error) {
-    res.status(500).json({
+    // Handle unexpected errors
+    console.error("Error in createJob:", error);
+    return res.status(500).json({
+      message: "Failed to create job. Please try again later.",
       success: false,
-      message: "Failed to create job",
       error: error.message,
     });
   }
@@ -86,7 +101,9 @@ export const getAllJobs = async (req, res) => {
 export const getJobsById = async (req, res) => {
   try {
     const jobId = req.params.id;
-    const job = await Job.findById(jobId);
+    const job = await Job.findById(jobId).populate({
+      path: "applications",
+    });
     if (!job) {
       return res.status(404).json({
         message: "Job not found.",

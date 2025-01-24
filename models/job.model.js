@@ -20,7 +20,6 @@ const jobSchema = new mongoose.Schema({
     default: "Full-Time",
   },
   wage: {
-    //salary
     type: Number,
     required: true, // Hourly or daily wage for the job
   },
@@ -33,6 +32,10 @@ const jobSchema = new mongoose.Schema({
     type: [String], // List of requirements (e.g., "Must have a valid driver's license")
     default: [],
   },
+  userFullname: {
+    type: String, // Store the fullname of the user who posted the job
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -41,6 +44,12 @@ const jobSchema = new mongoose.Schema({
     type: Boolean,
     default: true, // Job posting is active or inactive
   },
+  applications: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Application",
+    },
+  ],
 });
 
 const job = mongoose.model("Job", jobSchema);
