@@ -4,6 +4,7 @@ import {
   getAppliedJobs,
   getUserApplications,
   updateApplicationStatus,
+  userAppliedJobsProfile
 } from "../controllers/application.controller.js";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
 
@@ -21,5 +22,7 @@ router.route("/:id/applicants").get(isAuthenticated, getUserApplications); // Ge
 
 // Route for updating the application status (PATCH request)
 router.route("/status/:id/update").post(isAuthenticated, updateApplicationStatus); // Update the application status (accept/reject)
+
+router.route("/appliedJobsProfile/:id").get(isAuthenticated, userAppliedJobsProfile);
 
 export default router;

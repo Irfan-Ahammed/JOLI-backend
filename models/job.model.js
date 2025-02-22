@@ -21,28 +21,29 @@ const jobSchema = new mongoose.Schema({
   },
   wage: {
     type: Number,
-    required: true, // Hourly or daily wage for the job
+    required: true,
   },
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // Reference to the user who posted the job
+    ref: "User",
     required: true,
   },
   requirements: {
-    type: [String], // List of requirements (e.g., "Must have a valid driver's license")
+    type: [String],
     default: [],
   },
   userFullname: {
-    type: String, // Store the fullname of the user who posted the job
+    type: String,
     required: true,
   },
   createdAt: {
     type: Date,
     default: Date.now,
+    index: true,
   },
   isActive: {
     type: Boolean,
-    default: true, // Job posting is active or inactive
+    default: true,
   },
   applications: [
     {
@@ -52,5 +53,5 @@ const jobSchema = new mongoose.Schema({
   ],
 });
 
-const job = mongoose.model("Job", jobSchema);
-export default job;
+const Job = mongoose.model("Job", jobSchema);
+export default Job;

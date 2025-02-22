@@ -105,33 +105,37 @@ export const logout = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { fullname, email, phoneNumber, bio, location, dpImage } = req.body;
+    const { fullname, email, phoneNumber, bio, location } = req.body;
     console.log(req.body);
 
-    const file = req.file;
-    const fileUri = getDatauri(file);
-    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-
-    const userId = req.id; //middleware authentication
+    const userId = req.id; // From middleware authentication
     let user = await User.findById(userId);
 
     if (!user) {
       return res.status(400).json({
-        message: "User not fount.",
+        message: "User not found.",
         success: false,
       });
     }
-    //updating data
+
+    // Check if a file was uploaded
+    if (req.file) {
+      const fileUri = getDatauri(req.file);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      user.dpImage = cloudResponse.secure_url; // Update the user's profile image URL
+    }
+
+    // Update other user data
     if (fullname) user.fullname = fullname;
     if (email) user.email = email;
     if (phoneNumber) user.phoneNumber = phoneNumber;
     if (bio) user.profile.bio = bio;
     if (location) user.profile.location = location;
-    if (dpImage) user.dpImage = dpImage;
-    if (cloudResponse) user.dpImage = cloudResponse.secure_url;
+
     await user.save();
 
-    user = {
+    // Return the updated user data
+    const updatedUser = {
       _id: user._id,
       fullname: user.fullname,
       email: user.email,
@@ -139,12 +143,17 @@ export const updateProfile = async (req, res) => {
       profile: user.profile,
       dpImage: user.dpImage,
     };
+
     return res.status(200).json({
       message: "Profile updated successfully.",
-      user,
+      user: updatedUser,
       success: true,
     });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({
+      message: "Internal server error.",
+      success: false,
+    });
   }
 };

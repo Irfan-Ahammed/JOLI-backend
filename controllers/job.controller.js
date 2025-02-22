@@ -4,27 +4,16 @@ import User from "../models/user.model.js";
 // Create a new job
 export const createJob = async (req, res) => {
   try {
-    const { title, description, requirements, wage, location, jobType } =
-      req.body;
+    const { title, description, requirements, wage, location, jobType } = req.body;
     const userId = req.id;
 
-    // Validate required fields
-    if (
-      !title ||
-      !description ||
-      !requirements ||
-      !wage ||
-      !location ||
-      !jobType ||
-      !userId
-    ) {
+    if (!title || !description || !requirements || !wage || !location || !jobType || !userId) {
       return res.status(400).json({
         message: "Something is missing. Please provide all required fields.",
         success: false,
       });
     }
 
-    // Fetch user details (including fullname) from the User model
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -33,11 +22,10 @@ export const createJob = async (req, res) => {
       });
     }
 
-    // Create a new job with the user's fullname included
     const job = await Job.create({
       title,
       description,
-      requirements: requirements.split(","),
+      requirements: Array.isArray(requirements) ? requirements : requirements.split(","),
       wage: Number(wage),
       location,
       jobType,
@@ -45,14 +33,16 @@ export const createJob = async (req, res) => {
       userFullname: user.fullname,
     });
 
-    // Send success response
+    // Update user's createdJobs array
+    user.createdJobs.push(job._id);
+    await user.save();
+    
     return res.status(201).json({
       message: "New job created successfully.",
       job,
       success: true,
     });
   } catch (error) {
-    // Handle unexpected errors
     console.error("Error in createJob:", error);
     return res.status(500).json({
       message: "Failed to create job. Please try again later.",

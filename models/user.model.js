@@ -3,35 +3,47 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
   fullname: {
     type: String,
-    required: true,
+    required: true
   },
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
   phoneNumber: {
     type: Number,
-    required: true,
+    required: true
   },
   password: {
     type: String,
-    required: true,
+    required: true
   },
   profile: {
     bio: {
-      type: String,
+      type: String
     },
     location: {
       type: String,
       required: true,
-      default: "Unknown", // Default value for location
-    },
+      default: "Unknown" // Default value for location
+    }
   },
   dpImage: {
     type: String,
-    default: "", 
+    default: ""
   },
+  appliedJobs: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Job"
+    }
+  ],
+  createdJobs: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Job"
+    }
+  ]
 });
 
 const User = mongoose.model("User", userSchema);
