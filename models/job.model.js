@@ -4,53 +4,57 @@ const jobSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    trim: true,
+    trim: true
   },
   description: {
     type: String,
-    required: true,
+    required: true
   },
   location: {
     type: String,
-    required: true,
+    required: true
   },
   jobType: {
     type: String,
     enum: ["Full-Time", "Part-Time", "Contract", "Temporary"],
-    default: "Full-Time",
+    default: "Full-Time"
   },
   wage: {
     type: Number,
-    required: true,
+    required: true
   },
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
+    required: true
   },
   requirements: {
     type: [String],
-    default: [],
+    default: []
   },
   userFullname: {
     type: String,
-    required: true,
+    required: true
+  },
+  userImage: {
+    type: String,
+    default: ""
   },
   createdAt: {
     type: Date,
     default: Date.now,
-    index: true,
+    index: true
   },
   isActive: {
     type: Boolean,
-    default: true,
+    default: true
   },
   applications: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Application",
-    },
-  ],
+      ref: "Application"
+    }
+  ]
 });
 
 const Job = mongoose.model("Job", jobSchema);
